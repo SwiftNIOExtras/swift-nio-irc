@@ -1,6 +1,12 @@
 # SwiftNIO IRC
 
-SwiftNIO IRC is a Internet Relay Chat 
+![Swift4](https://img.shields.io/badge/swift-4-blue.svg)
+![iOS](https://img.shields.io/badge/os-iOS-green.svg?style=flat)
+![macOS](https://img.shields.io/badge/os-macOS-green.svg?style=flat)
+![tuxOS](https://img.shields.io/badge/os-tuxOS-green.svg?style=flat)
+![Travis](https://travis-ci.org/NozeIO/swift-nio-irc.svg?branch=develop)
+
+SwiftNIO-IRC is a Internet Relay Chat 
 [protocol implementation](Sources/NIOIRC) for
 [SwiftNIO](https://github.com/apple/swift-nio)
 and a simple 
