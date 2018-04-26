@@ -12,6 +12,19 @@ SwiftNIO-IRC is a Internet Relay Chat
 and a simple 
 [IRC client](Sources/IRC).
 
+This module contains the protocol implementation and the client, we also
+provide:
+- [swift-nio-irc-webclient](https://github.com/NozeIO/swift-nio-irc-webclient) -
+  a simple IRC webclient + WebSocket gateway based on this module,
+- [swift-nio-irc-eliza](https://github.com/NozeIO/swift-nio-irc-eliza) -
+  a cheap yet scalable therapist,
+- [swift-nio-irc-server](https://github.com/NozeIO/swift-nio-irc-server) -
+  a framework to build IRC servers, and MiniIRCd, a small sample server.
+  
+To get started with this, pull 
+[swift-nio-irc-server](https://github.com/NozeIO/swift-nio-irc-server) -
+a module to rule them all and in the darkness bind them.
+
 NIOIRC is a SwiftNIO port of the
 [Noze.io miniirc](https://github.com/NozeIO/Noze.io/tree/master/Samples/miniirc)
 example from 2016.
