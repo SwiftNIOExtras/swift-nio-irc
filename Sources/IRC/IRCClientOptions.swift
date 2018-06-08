@@ -16,7 +16,7 @@ import protocol NIO.EventLoopGroup
 import class    NIO.MultiThreadedEventLoopGroup
 
 fileprivate let onDemandSharedEventLoopGroup =
-                  MultiThreadedEventLoopGroup(numThreads: 1)
+                    MultiThreadedEventLoopGroup(numberOfThreads: 1)
 
 /// Configuration options for the socket connects
 open class ConnectOptions : CustomStringConvertible {
