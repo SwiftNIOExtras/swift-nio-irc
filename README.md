@@ -8,12 +8,11 @@
 
 SwiftNIO-IRC is a Internet Relay Chat 
 [protocol implementation](Sources/NIOIRC) for
-[SwiftNIO](https://github.com/apple/swift-nio)
-and a simple 
-[IRC client](Sources/IRC).
+[SwiftNIO](https://github.com/apple/swift-nio).
 
-This module contains the protocol implementation and the client, we also
+This module contains just the protocol implementation. We also
 provide:
+- [swift-nio-irc-client](https://github.com/NozeIO/swift-nio-irc-client) - a simple IRC client lib
 - [swift-nio-irc-webclient](https://github.com/NozeIO/swift-nio-irc-webclient) -
   a simple IRC webclient + WebSocket gateway based on this module,
 - [swift-nio-irc-eliza](https://github.com/NozeIO/swift-nio-irc-eliza) -
@@ -42,14 +41,12 @@ import PackageDescription
 let package = Package(
     name: "IRCTests",
     dependencies: [
-        .package(url: "https://github.com/NozeIO/swift-nio-irc.git",
-                 from: "0.5.0")
+        .package(url: "https://github.com/SwiftNIOExtras/swift-nio-irc.git",
+                 from: "0.6.0")
     ],
     targets: [
         .target(name: "MyProtocolTool",
-                dependencies: [ "NIOIRC" ]),
-        .target(name: "MyIRCClient",
-                dependencies: [ "IRC" ])
+                dependencies: [ "NIOIRC" ])
     ]
 )
 ```
