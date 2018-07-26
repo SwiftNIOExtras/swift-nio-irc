@@ -5,15 +5,13 @@ import PackageDescription
 let package = Package(
     name: "swift-nio-irc",
     products: [
-        .library   (name: "NIOIRC", targets: [ "NIOIRC" ]),
-        .library   (name: "IRC",    targets: [ "IRC"    ])
+        .library(name: "NIOIRC", targets: [ "NIOIRC" ])
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-nio.git", 
                  from: "1.8.0")
     ],
     targets: [
-        .target(name: "NIOIRC", dependencies: [ "NIO"    ]),
-        .target(name: "IRC",    dependencies: [ "NIOIRC" ])
+        .target(name: "NIOIRC", dependencies: [ "NIO" ])
     ]
 )
