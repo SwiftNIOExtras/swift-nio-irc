@@ -4,7 +4,7 @@
 ![iOS](https://img.shields.io/badge/os-iOS-green.svg?style=flat)
 ![macOS](https://img.shields.io/badge/os-macOS-green.svg?style=flat)
 ![tuxOS](https://img.shields.io/badge/os-tuxOS-green.svg?style=flat)
-![Travis](https://travis-ci.org/NozeIO/swift-nio-irc.svg?branch=master)
+<a href="https://travis-ci.org/SwiftNIOExtras/swift-nio-irc"><img src="https://travis-ci.org/SwiftNIOExtras/swift-nio-irc.svg?branch=master" /></a>
 
 SwiftNIO-IRC is a Internet Relay Chat 
 [protocol implementation](Sources/NIOIRC) for
