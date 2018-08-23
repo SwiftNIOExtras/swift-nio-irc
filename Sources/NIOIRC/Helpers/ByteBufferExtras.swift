@@ -52,7 +52,7 @@ extension ByteBuffer {
     let avail     = capacity - index
     
     if avail < charCount {
-      changeCapacity(to: capacity + (charCount - avail))
+      reserveCapacity(capacity + (charCount - avail))
     }
 
     self.withVeryUnsafeBytes { rbpp in
