@@ -73,7 +73,10 @@ public struct IRCMessageParser {
         if idx > cursor.startIndex && cursor[idx - 1] == cCarriageReturn {
           idx -= 1
         }
-        guard cursor.startIndex < idx else { continue } // skip empty lines
+        guard cursor.startIndex < idx else {  // skip empty lines
+          cursor = nextCursor
+          continue
+        }
         
         do {
           let message = try processLine(cursor[cursor.startIndex..<idx])
