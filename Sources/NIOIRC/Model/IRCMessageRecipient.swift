@@ -44,7 +44,7 @@ public enum IRCMessageRecipient : Hashable {
 
 public extension IRCMessageRecipient {
   
-  public init?(_ s: String) {
+  init?(_ s: String) {
     if s == "*" {
       self = .everything
     }
@@ -59,7 +59,7 @@ public extension IRCMessageRecipient {
     }
   }
   
-  public var stringValue : String {
+  var stringValue : String {
     switch self {
       case .channel (let name): return name.stringValue
       case .nickname(let name): return name.stringValue

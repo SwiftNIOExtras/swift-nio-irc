@@ -21,7 +21,7 @@ public extension IRCCommand {
    * The parser validates the argument counts etc and throws exceptions on
    * unexpected input.
    */
-  public init(_ command: String, arguments: [ String ]) throws {
+  init(_ command: String, arguments: [ String ]) throws {
     typealias Error = IRCParserError
     
     func expect(argc: Int) throws {
@@ -255,7 +255,7 @@ public extension IRCCommand {
    * The parser validates the argument counts etc and throws exceptions on
    * unexpected input.
    */
-  public init(_ v: Int, arguments: [ String ]) throws {
+  init(_ v: Int, arguments: [ String ]) throws {
     if let code = IRCCommandCode(rawValue: v) {
       self = .numeric(code, arguments)
     }
@@ -271,7 +271,7 @@ public extension IRCCommand {
    * The parser validates the argument counts etc and throws exceptions on
    * unexpected input.
    */
-  public init(_ s: String, _ arguments: String...) throws {
+  init(_ s: String, _ arguments: String...) throws {
     try self.init(s, arguments: arguments)
   }
   
@@ -282,7 +282,7 @@ public extension IRCCommand {
    * The parser validates the argument counts etc and throws exceptions on
    * unexpected input.
    */
-  public init(_ v: Int, _ arguments: String...) throws {
+  init(_ v: Int, _ arguments: String...) throws {
     try self.init(v, arguments: arguments)
   }
 }
