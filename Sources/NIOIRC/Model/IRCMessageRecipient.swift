@@ -22,13 +22,23 @@ public enum IRCMessageRecipient : Hashable {
   // or: user, or user%host, @server, etc
   // or: nickname!user@host
   
-  public var hashValue: Int {
-    switch self {
-      case .channel (let name): return name.hashValue
-      case .nickname(let name): return name.hashValue
-      case .everything:         return 42
+  #if compiler(>=5)
+    public func hash(into hasher: inout Hasher) {
+      switch self {
+        case .channel (let name): return name.hash(into: &hasher)
+        case .nickname(let name): return name.hash(into: &hasher)
+        case .everything:         return 42.hash(into: &hasher) // TBD?
+      }
     }
-  }
+  #else
+    public var hashValue: Int {
+      switch self {
+        case .channel (let name): return name.hashValue
+        case .nickname(let name): return name.hashValue
+        case .everything:         return 42
+      }
+    }
+  #endif
   
   public static func ==(lhs: IRCMessageRecipient, rhs: IRCMessageRecipient)
                   -> Bool
@@ -44,7 +54,7 @@ public enum IRCMessageRecipient : Hashable {
 
 public extension IRCMessageRecipient {
   
-  public init?(_ s: String) {
+  init?(_ s: String) {
     if s == "*" {
       self = .everything
     }
@@ -59,7 +69,7 @@ public extension IRCMessageRecipient {
     }
   }
   
-  public var stringValue : String {
+  var stringValue : String {
     switch self {
       case .channel (let name): return name.stringValue
       case .nickname(let name): return name.stringValue
