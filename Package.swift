@@ -9,7 +9,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-nio.git", 
-                 from: "1.9.2")
+                 from: "1.13.2")
     ],
     targets: [
         .target(name: "NIOIRC", dependencies: [ "NIO" ])
