@@ -52,7 +52,11 @@ public struct IRCUserID : Hashable, CustomStringConvertible {
     }
   }
   
-  public var hashValue: Int { return nick.hashValue }
+  #if compiler(>=5)
+    public func hash(into hasher: inout Hasher) { nick.hash(into: &hasher) }
+  #else
+    public var hashValue: Int { return nick.hashValue }
+  #endif
   
   public static func ==(lhs: IRCUserID, rhs: IRCUserID) -> Bool {
     return lhs.nick == rhs.nick && lhs.user == rhs.user && lhs.host == rhs.host

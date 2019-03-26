@@ -37,9 +37,15 @@ public struct IRCNickName : Hashable, CustomStringConvertible {
     return storage
   }
   
-  public var hashValue: Int {
-    return normalized.hashValue
-  }
+  #if compiler(>=5)
+    public func hash(into hasher: inout Hasher) {
+      normalized.hash(into: &hasher)
+    }
+  #else
+    public var hashValue: Int {
+      return normalized.hashValue
+    }
+  #endif
   
   public static func ==(lhs: IRCNickName, rhs: IRCNickName) -> Bool {
     return lhs.normalized == rhs.normalized
