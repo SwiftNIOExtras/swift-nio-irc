@@ -26,12 +26,22 @@ public struct IRCUserID : Hashable, CustomStringConvertible {
   }
   
   public init?(_ s: String) {
-    if let atIdx = s.index(of: "@") {
+    #if swift(>=5)
+      let atIdx = s.firstIndex(of: "@")
+    #else
+      let atIdx = s.index(of: "@")
+    #endif
+    if let atIdx = atIdx {
       let hs = s.index(after: atIdx)
       self.host = String(s[hs..<s.endIndex])
       
       let nickString : String
-      if let exIdx = s.index(of: "!") {
+      #if swift(>=5)
+        let exIdx = s.firstIndex(of: "!")
+      #else
+        let exIdx = s.index(of: "!")
+      #endif
+      if let exIdx = exIdx {
         let hs = s.index(after: exIdx)
         self.user = String(s[hs..<atIdx])
         
