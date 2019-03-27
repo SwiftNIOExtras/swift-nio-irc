@@ -303,7 +303,8 @@ extension ByteBuffer {
   
 }
 
-#if swift(<5)
+#if swift(>=5)
+#else
 fileprivate extension ByteBuffer {
   // NIO 2 API for NIO 1
   
