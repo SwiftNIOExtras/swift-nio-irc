@@ -304,16 +304,17 @@ extension ByteBuffer {
 }
 
 #if swift(>=5)
+  // NIO 2
 #else
 fileprivate extension ByteBuffer {
   // NIO 2 API for NIO 1
   
-  @inline(__always)
+  @inline(__always) @discardableResult
   mutating func writeString(_ string: String) -> Int {
-    return self.write(string: string)
+    return self.write(string: string) ?? -1337 // never fails
   }
 
-  @inline(__always)
+  @inline(__always) @discardableResult
   mutating func writeInteger<T: FixedWidthInteger>(_ integer: T) -> Int {
     return self.write(integer: integer)
   }
