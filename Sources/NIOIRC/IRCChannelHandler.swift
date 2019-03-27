@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2019 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -108,23 +108,23 @@ open class IRCChannelHandler : ChannelDuplexHandler {
     let cLF    : UInt8 = 10
 
     if let origin = value.origin, !origin.isEmpty {
-      buffer.write(integer : cColon)
-      buffer.write(string  : origin)
-      buffer.write(integer : cSpace)
+      buffer.writeInteger(cColon)
+      buffer.writeString(origin)
+      buffer.writeInteger(cSpace)
     }
     
-    buffer.write(string: value.command.commandAsString)
+    buffer.writeString(value.command.commandAsString)
     
     if let s = target {
-      buffer.write(integer : cSpace)
-      buffer.write(string  : s)
+      buffer.writeInteger(cSpace)
+      buffer.writeString(s)
     }
     
     switch value.command {
       case .PING(let s, let s2), .PONG(let s, let s2):
         if let s2 = s2 {
-          buffer.write(integer : cSpace)
-          buffer.write(string  : s)
+          buffer.writeInteger(cSpace)
+          buffer.writeString(s)
           buffer.writeLastArgument(s2)
         }
         else {
@@ -135,12 +135,12 @@ open class IRCChannelHandler : ChannelDuplexHandler {
         buffer.writeLastArgument(v)
       
       case .NICK(let v), .MODEGET(let v):
-        buffer.write(integer : cSpace)
-        buffer.write(string  : v.stringValue)
+        buffer.writeInteger(cSpace)
+        buffer.writeString(v.stringValue)
       
       case .MODE(let nick, let add, let remove):
-        buffer.write(integer : cSpace)
-        buffer.write(string  : nick.stringValue)
+        buffer.writeInteger(cSpace)
+        buffer.writeString(nick.stringValue)
         
         let adds = add   .stringValue.map { "+\($0)" }
         let rems = remove.stringValue.map { "-\($0)" }
@@ -152,37 +152,37 @@ open class IRCChannelHandler : ChannelDuplexHandler {
         }
 
       case .CHANNELMODE_GET(let v):
-        buffer.write(integer : cSpace)
-        buffer.write(string  : v.stringValue)
+        buffer.writeInteger(cSpace)
+        buffer.writeString(v.stringValue)
       
       case .CHANNELMODE_GET_BANMASK(let v):
-        buffer.write(integer : cSpace)
-        buffer.write(integer : UInt8(98)) // 'b'
-        buffer.write(integer : cSpace)
-        buffer.write(string  : v.stringValue)
+        buffer.writeInteger(cSpace)
+        buffer.writeInteger(UInt8(98)) // 'b'
+        buffer.writeInteger(cSpace)
+        buffer.writeString(v.stringValue)
 
       case .CHANNELMODE(let channel, let add, let remove):
-        buffer.write(integer : cSpace)
-        buffer.write(string  : channel.stringValue)
+        buffer.writeInteger(cSpace)
+        buffer.writeString(channel.stringValue)
         
         let adds = add   .stringValue.map { "+\($0)" }
         let rems = remove.stringValue.map { "-\($0)" }
         buffer.writeArguments(adds + rems, useLast: true)
       
       case .USER(let userInfo):
-        buffer.write(integer         : cSpace)
-        buffer.write(string          : userInfo.username)
+        buffer.writeInteger(cSpace)
+        buffer.writeString(userInfo.username)
         if let mask = userInfo.usermask {
-          buffer.write(integer         : cSpace)
-          buffer.write(integerAsString : Int(mask.maskValue))
-          buffer.write(integer         : cSpace)
-          buffer.write(integer         : cStar)
+          buffer.writeInteger(cSpace)
+          buffer.write(integerAsString: Int(mask.maskValue))
+          buffer.writeInteger(cSpace)
+          buffer.writeInteger(cStar)
         }
         else {
-          buffer.write(integer : cSpace)
-          buffer.write(string  : userInfo.hostname ?? "*")
-          buffer.write(integer : cSpace)
-          buffer.write(string  : userInfo.servername ?? "*")
+          buffer.writeInteger(cSpace)
+          buffer.writeString(userInfo.hostname ?? "*")
+          buffer.writeInteger(cSpace)
+          buffer.writeString(userInfo.servername ?? "*")
         }
         buffer.writeLastArgument(userInfo.realname)
 
@@ -193,7 +193,7 @@ open class IRCChannelHandler : ChannelDuplexHandler {
         buffer.writeArguments(nicks.lazy.map { $0.stringValue })
       
       case .JOIN0:
-        buffer.write(string: " *")
+        buffer.writeString(" *")
       
       case .JOIN(let channels, let keys):
         buffer.writeCSVArgument(channels.lazy.map { $0.stringValue })
@@ -207,7 +207,7 @@ open class IRCChannelHandler : ChannelDuplexHandler {
         if let channels = channels {
           buffer.writeCSVArgument(channels.lazy.map { $0.stringValue })
         }
-        else { buffer.write(string: " *")}
+        else { buffer.writeString(" *") }
         if let target = target { buffer.writeLastArgument(target) }
       
       case .PRIVMSG(let recipients, let message),
@@ -216,25 +216,25 @@ open class IRCChannelHandler : ChannelDuplexHandler {
         buffer.writeLastArgument(message)
       
       case .CAP(let subcmd, let capIDs):
-        buffer.write(integer : cSpace)
-        buffer.write(string  : subcmd.commandAsString)
+        buffer.writeInteger(cSpace)
+        buffer.writeString(subcmd.commandAsString)
         buffer.writeLastArgument(capIDs.joined(separator: " "))
 
       case .WHOIS(let target, let masks):
         if let target = target {
-          buffer.write(integer : cSpace)
-          buffer.write(string  : target)
+          buffer.writeInteger(cSpace)
+          buffer.writeString(target)
         }
-        buffer.write(integer : cSpace)
-        buffer.write(string  : masks.joined(separator: ","))
+        buffer.writeInteger(cSpace)
+        buffer.writeString(masks.joined(separator: ","))
 
       case .WHO(let mask, let opOnly):
         if let mask = mask {
-          buffer.write(integer : cSpace)
-          buffer.write(string  : mask)
+          buffer.writeInteger(cSpace)
+          buffer.writeString(mask)
           if opOnly {
-            buffer.write(integer : cSpace)
-            buffer.write(integer : UInt8(111)) // o
+            buffer.writeInteger(cSpace)
+            buffer.writeInteger(UInt8(111)) // o
           }
         }
 
@@ -244,8 +244,8 @@ open class IRCChannelHandler : ChannelDuplexHandler {
         buffer.writeArguments(args, useLast: true)
     }
     
-    buffer.write(integer: cCR)
-    buffer.write(integer: cLF)
+    buffer.writeInteger(cCR)
+    buffer.writeInteger(cLF)
   }
 }
 
@@ -257,13 +257,13 @@ extension ByteBuffer {
     let cSpace : UInt8 = 32
     let cComma : UInt8 = 44
     
-    write(integer : cSpace)
+    writeInteger(cSpace)
     
     var isFirst = true
     for arg in args {
       if isFirst { isFirst = false }
-      else { write(integer: cComma) }
-      write(string: arg)
+      else { writeInteger(cComma) }
+      writeString(arg)
     }
   }
   mutating func writeArguments<T: Sequence>(_ args: T)
@@ -272,8 +272,8 @@ extension ByteBuffer {
     let cSpace : UInt8 = 32
     
     for arg in args {
-      write(integer : cSpace)
-      write(string  : arg)
+      writeInteger(cSpace)
+      writeString(arg)
     }
   }
   mutating func writeArguments<T: Collection>(_ args: T, useLast: Bool = false)
@@ -284,8 +284,8 @@ extension ByteBuffer {
     guard !args.isEmpty else { return }
     
     for arg in args.dropLast() {
-      write(integer : cSpace)
-      write(string  : arg)
+      writeInteger(cSpace)
+      writeString(arg)
     }
     
     let lastIdx = args.index(args.startIndex, offsetBy: args.count - 1)
@@ -296,9 +296,27 @@ extension ByteBuffer {
     let cSpace : UInt8 = 32
     let cColon : UInt8 = 58
     
-    write(integer : cSpace)
-    write(integer : cColon)
-    write(string  : s)
+    writeInteger(cSpace)
+    writeInteger(cColon)
+    writeString(s)
   }
   
 }
+
+#if swift(>=5)
+  // NIO 2
+#else
+fileprivate extension ByteBuffer {
+  // NIO 2 API for NIO 1
+  
+  @inline(__always) @discardableResult
+  mutating func writeString(_ string: String) -> Int {
+    return self.write(string: string) ?? -1337 // never fails
+  }
+
+  @inline(__always) @discardableResult
+  mutating func writeInteger<T: FixedWidthInteger>(_ integer: T) -> Int {
+    return self.write(integer: integer)
+  }
+}
+#endif // swift(<5)

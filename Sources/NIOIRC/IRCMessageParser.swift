@@ -56,7 +56,11 @@ public struct IRCMessageParser {
     if var ob = overflowBuffer {
       overflowBuffer = nil
       var bb = buffer
-      ob.write(buffer: &bb)
+      #if swift(>=5)
+        ob.writeBuffer(&bb)
+      #else
+        ob.write(buffer: &bb)
+      #endif
       return feed(ob, yield: yield)
     }
     
@@ -67,7 +71,11 @@ public struct IRCMessageParser {
       var cursor          = bp[bp.startIndex..<bp.endIndex]
       
       while !cursor.isEmpty {
-        guard var idx = cursor.index(of: cNewline) else { break }
+        #if swift(>=5)
+          guard var idx = cursor.firstIndex(of: cNewline) else { break }
+        #else
+          guard var idx = cursor.index(of: cNewline) else { break }
+        #endif
         
         let nextCursor = cursor[idx.advanced(by: 1)..<cursor.endIndex]
         if idx > cursor.startIndex && cursor[idx - 1] == cCarriageReturn {
@@ -91,7 +99,11 @@ public struct IRCMessageParser {
       
       if !cursor.isEmpty {
         overflowBuffer = allocator.buffer(capacity: cursor.count)
-        overflowBuffer!.write(bytes: cursor)
+        #if swift(>=5)
+          overflowBuffer!.writeBytes(cursor)
+        #else
+          overflowBuffer!.write(bytes: cursor)
+        #endif
       }
     }
   }
@@ -143,10 +155,14 @@ public struct IRCMessageParser {
     
     if cursor[cursor.startIndex] == cColon {
       let startIndex = cursor.startIndex.advanced(by: 1)
-      
-      guard let endSourceIdx = line.index(of: cSpace),
-            endSourceIdx > startIndex else
-      {
+
+      #if swift(>=5)
+        let spaceIdx = line.firstIndex(of: cSpace)
+      #else
+        let spaceIdx = line.index(of: cSpace)
+      #endif
+
+      guard let endSourceIdx = spaceIdx, endSourceIdx > startIndex else {
         throw Error.invalidPrefix(Data(line))
       }
       
@@ -187,7 +203,12 @@ public struct IRCMessageParser {
       cursor = cursor[idx2.advanced(by: 1)..<cursor.endIndex]
     }
     else {
-      let endIdx = cursor.index(where: { !isLetter($0) }) ?? cursor.endIndex
+      #if swift(>=5)
+        let endIdx = cursor.firstIndex(where: { !isLetter($0) })
+                  ?? cursor.endIndex
+      #else
+        let endIdx = cursor.index(where: { !isLetter($0) }) ?? cursor.endIndex
+      #endif
       
       let cmdSlice = cursor[cursor.startIndex..<endIdx]
       guard let s = makeString(from: cmdSlice) else {
@@ -217,8 +238,14 @@ public struct IRCMessageParser {
         nextCursor = cursor[cursor.endIndex..<cursor.endIndex]
       }
       else if isNoSpaceControlLineFeedColon(cursor[cursor.startIndex]) {
-        let idx = cursor.index(where: { !isNoSpaceControlLineFeedColon($0) })
-               ?? cursor.endIndex
+        #if swift(>=5)
+          let idxO = cursor.firstIndex(where: {
+            !isNoSpaceControlLineFeedColon($0)
+          })
+        #else
+          let idxO = cursor.index(where: { !isNoSpaceControlLineFeedColon($0) })
+        #endif
+        let idx = idxO ?? cursor.endIndex
         argSlice   = cursor[cursor.startIndex..<idx]
         nextCursor = cursor[idx..<cursor.endIndex]
       }
