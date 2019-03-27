@@ -56,7 +56,11 @@ public struct IRCMessageParser {
     if var ob = overflowBuffer {
       overflowBuffer = nil
       var bb = buffer
-      ob.write(buffer: &bb)
+      #if swift(>=5)
+        ob.writeBuffer(&bb)
+      #else
+        ob.write(buffer: &bb)
+      #endif
       return feed(ob, yield: yield)
     }
     
@@ -95,7 +99,11 @@ public struct IRCMessageParser {
       
       if !cursor.isEmpty {
         overflowBuffer = allocator.buffer(capacity: cursor.count)
-        overflowBuffer!.write(bytes: cursor)
+        #if swift(>=5)
+          overflowBuffer!.writeBytes(cursor)
+        #else
+          overflowBuffer!.write(bytes: cursor)
+        #endif
       }
     }
   }
