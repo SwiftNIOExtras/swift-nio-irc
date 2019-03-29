@@ -46,11 +46,11 @@ open class IRCChannelHandler : ChannelDuplexHandler {
 
   public init() {}
   
-  open func channelActive(ctx: ChannelHandlerContext) {
-    ctx.fireChannelActive()
+  open func channelActive(context: ChannelHandlerContext) {
+    context.fireChannelActive()
   }
-  open func channelInactive(ctx: ChannelHandlerContext) {
-    ctx.fireChannelInactive()
+  open func channelInactive(context: ChannelHandlerContext) {
+    context.fireChannelInactive()
   }
 
   
@@ -58,44 +58,44 @@ open class IRCChannelHandler : ChannelDuplexHandler {
   
   var parser = IRCMessageParser()
   
-  open func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
+  open func channelRead(context: ChannelHandlerContext, data: NIOAny) {
     let buffer = self.unwrapInboundIn(data)
     
     parser.feed(buffer) { error, message in
       if let message = message {
-        channelRead(ctx: ctx, value: message)
+        channelRead(context: context, value: message)
       }
       if let error = error {
-        ctx.fireErrorCaught(error)
+        context.fireErrorCaught(error)
       }
     }
   }
   
-  open func channelRead(ctx: ChannelHandlerContext, value: InboundOut) {
-    ctx.fireChannelRead(self.wrapInboundOut(value))
+  open func channelRead(context: ChannelHandlerContext, value: InboundOut) {
+    context.fireChannelRead(self.wrapInboundOut(value))
   }
   
-  open func errorCaught(ctx: ChannelHandlerContext, error: Swift.Error) {
-    ctx.fireErrorCaught(InboundErr.transportError(error))
+  open func errorCaught(context: ChannelHandlerContext, error: Swift.Error) {
+    context.fireErrorCaught(InboundErr.transportError(error))
   }
 
   
   // MARK: - Writing
   
-  public func write(ctx: ChannelHandlerContext, data: NIOAny,
+  public func write(context: ChannelHandlerContext, data: NIOAny,
                     promise: EventLoopPromise<Void>?)
   {
     let message : OutboundIn = self.unwrapOutboundIn(data)
-    write(ctx: ctx, value: message, promise: promise)
+    write(context: context, value: message, promise: promise)
   }
   
-  public final func write(ctx: ChannelHandlerContext, value: IRCMessage,
+  public final func write(context: ChannelHandlerContext, value: IRCMessage,
                           promise: EventLoopPromise<Void>?)
   {
-    var buffer = ctx.channel.allocator.buffer(capacity: 200)
+    var buffer = context.channel.allocator.buffer(capacity: 200)
     encode(value: value, target: value.target, into: &buffer)
     
-    ctx.write(NIOAny(buffer), promise: promise)
+    context.write(NIOAny(buffer), promise: promise)
   }
   
   func encode(value: IRCMessage, target: String?,
@@ -247,6 +247,40 @@ open class IRCChannelHandler : ChannelDuplexHandler {
     buffer.writeInteger(cCR)
     buffer.writeInteger(cLF)
   }
+  
+  #if swift(>=5) // NIO 2 API - default
+  #else // NIO 1 API shims
+    open func channelActive(ctx context: ChannelHandlerContext) {
+      channelActive(context: context)
+    }
+    open func channelInactive(ctx context: ChannelHandlerContext) {
+      channelInactive(context: context)
+    }
+    open func channelRead(ctx context: ChannelHandlerContext, data: NIOAny) {
+      channelRead(context: context, data: data)
+    }
+    open func channelRead(ctx context: ChannelHandlerContext,
+                          value: InboundOut)
+    {
+      channelRead(context: context, value: value)
+    }
+    open func errorCaught(ctx context: ChannelHandlerContext,
+                          error: Swift.Error)
+    {
+      errorCaught(context: context, error: error)
+    }
+    public func write(ctx context: ChannelHandlerContext, data: NIOAny,
+                      promise: EventLoopPromise<Void>?)
+    {
+      write(context: context, data: data, promise: promise)
+    }
+    public final func write(ctx context: ChannelHandlerContext,
+                            value: IRCMessage,
+                            promise: EventLoopPromise<Void>?)
+    {
+      write(context: context, value: value, promise: promise)
+    }
+  #endif
 }
 
 extension ByteBuffer {
