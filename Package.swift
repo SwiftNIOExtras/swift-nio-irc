@@ -1,4 +1,4 @@
-// swift-tools-version:4.2
+// swift-tools-version:5.0
 
 import PackageDescription
 
@@ -9,7 +9,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-nio.git", 
-                 from: "1.13.2")
+                 from: "2.18.0")
     ],
     targets: [
         .target(name: "NIOIRC", dependencies: [ "NIO" ])
