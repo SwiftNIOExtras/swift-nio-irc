@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2020 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -34,6 +34,9 @@ public struct IRCUserMode : OptionSet {
   public static let disableForwarding     = IRCUserMode(rawValue: 1 << 10)
   public static let blockUnidentified     = IRCUserMode(rawValue: 1 << 11)
   public static let connectedSecurely     = IRCUserMode(rawValue: 1 << 12)
+  
+  // UnrealIRCd https://www.unrealircd.org/docs/User_Modes "x"
+  public static let hideHostname          = IRCUserMode(rawValue: 1 << 13)
 
   public var maskValue : UInt16 {
     return rawValue
@@ -43,17 +46,18 @@ public struct IRCUserMode : OptionSet {
     var mask : UInt16 = 0
     for c in string {
       switch c {
-        case "w": mask += IRCUserMode.receivesWallOps.rawValue
-        case "i": mask += IRCUserMode.invisible.rawValue
-        case "a": mask += IRCUserMode.away.rawValue
-        case "r": mask += IRCUserMode.restrictedConnection.rawValue
-        case "o": mask += IRCUserMode.operator.rawValue
-        case "O": mask += IRCUserMode.localOperator.rawValue
+        case "w": mask += IRCUserMode.receivesWallOps      .rawValue
+        case "i": mask += IRCUserMode.invisible            .rawValue
+        case "a": mask += IRCUserMode.away                 .rawValue
+        case "r": mask += IRCUserMode.restrictedConnection .rawValue
+        case "o": mask += IRCUserMode.operator             .rawValue
+        case "O": mask += IRCUserMode.localOperator        .rawValue
         case "s": mask += IRCUserMode.receivesServerNotices.rawValue
-        case "g": mask += IRCUserMode.ignoreUnknown.rawValue
-        case "Q": mask += IRCUserMode.disableForwarding.rawValue
-        case "R": mask += IRCUserMode.blockUnidentified.rawValue
-        case "Z": mask += IRCUserMode.connectedSecurely.rawValue
+        case "g": mask += IRCUserMode.ignoreUnknown        .rawValue
+        case "Q": mask += IRCUserMode.disableForwarding    .rawValue
+        case "R": mask += IRCUserMode.blockUnidentified    .rawValue
+        case "Z": mask += IRCUserMode.connectedSecurely    .rawValue
+        case "x": mask += IRCUserMode.hideHostname         .rawValue
         default: return nil
       }
     }
@@ -63,6 +67,7 @@ public struct IRCUserMode : OptionSet {
   
   public var stringValue : String {
     var mode = ""
+    mode.reserveCapacity(8)
     if contains(.receivesWallOps)       { mode += "w" }
     if contains(.invisible)             { mode += "i" }
     if contains(.away)                  { mode += "a" }
@@ -74,6 +79,7 @@ public struct IRCUserMode : OptionSet {
     if contains(.disableForwarding)     { mode += "Q" }
     if contains(.blockUnidentified)     { mode += "R" }
     if contains(.connectedSecurely)     { mode += "Z" }
+    if contains(.hideHostname)          { mode += "x" }
     return mode
   }
 }
