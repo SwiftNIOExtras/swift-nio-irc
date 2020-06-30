@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018-2019 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2020 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -247,40 +247,6 @@ open class IRCChannelHandler : ChannelDuplexHandler {
     buffer.writeInteger(cCR)
     buffer.writeInteger(cLF)
   }
-  
-  #if swift(>=5) // NIO 2 API - default
-  #else // NIO 1 API shims
-    open func channelActive(ctx context: ChannelHandlerContext) {
-      channelActive(context: context)
-    }
-    open func channelInactive(ctx context: ChannelHandlerContext) {
-      channelInactive(context: context)
-    }
-    open func channelRead(ctx context: ChannelHandlerContext, data: NIOAny) {
-      channelRead(context: context, data: data)
-    }
-    open func channelRead(ctx context: ChannelHandlerContext,
-                          value: InboundOut)
-    {
-      channelRead(context: context, value: value)
-    }
-    open func errorCaught(ctx context: ChannelHandlerContext,
-                          error: Swift.Error)
-    {
-      errorCaught(context: context, error: error)
-    }
-    public func write(ctx context: ChannelHandlerContext, data: NIOAny,
-                      promise: EventLoopPromise<Void>?)
-    {
-      write(context: context, data: data, promise: promise)
-    }
-    public final func write(ctx context: ChannelHandlerContext,
-                            value: IRCMessage,
-                            promise: EventLoopPromise<Void>?)
-    {
-      write(context: context, value: value, promise: promise)
-    }
-  #endif
 }
 
 extension ByteBuffer {
@@ -336,21 +302,3 @@ extension ByteBuffer {
   }
   
 }
-
-#if swift(>=5)
-  // NIO 2
-#else
-fileprivate extension ByteBuffer {
-  // NIO 2 API for NIO 1
-  
-  @inline(__always) @discardableResult
-  mutating func writeString(_ string: String) -> Int {
-    return self.write(string: string) ?? -1337 // never fails
-  }
-
-  @inline(__always) @discardableResult
-  mutating func writeInteger<T: FixedWidthInteger>(_ integer: T) -> Int {
-    return self.write(integer: integer)
-  }
-}
-#endif // swift(<5)
