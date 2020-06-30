@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2020 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -26,22 +26,12 @@ public struct IRCUserID : Hashable, CustomStringConvertible {
   }
   
   public init?(_ s: String) {
-    #if swift(>=5)
-      let atIdx = s.firstIndex(of: "@")
-    #else
-      let atIdx = s.index(of: "@")
-    #endif
-    if let atIdx = atIdx {
+    if let atIdx = s.firstIndex(of: "@") {
       let hs = s.index(after: atIdx)
       self.host = String(s[hs..<s.endIndex])
       
       let nickString : String
-      #if swift(>=5)
-        let exIdx = s.firstIndex(of: "!")
-      #else
-        let exIdx = s.index(of: "!")
-      #endif
-      if let exIdx = exIdx {
+      if let exIdx = s.firstIndex(of: "!") {
         let hs = s.index(after: exIdx)
         self.user = String(s[hs..<atIdx])
         

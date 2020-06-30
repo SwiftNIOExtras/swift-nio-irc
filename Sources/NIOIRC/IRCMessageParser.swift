@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2020 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -56,11 +56,7 @@ public struct IRCMessageParser {
     if var ob = overflowBuffer {
       overflowBuffer = nil
       var bb = buffer
-      #if swift(>=5)
-        ob.writeBuffer(&bb)
-      #else
-        ob.write(buffer: &bb)
-      #endif
+      ob.writeBuffer(&bb)
       return feed(ob, yield: yield)
     }
     
@@ -71,11 +67,7 @@ public struct IRCMessageParser {
       var cursor          = bp[bp.startIndex..<bp.endIndex]
       
       while !cursor.isEmpty {
-        #if swift(>=5)
-          guard var idx = cursor.firstIndex(of: cNewline) else { break }
-        #else
-          guard var idx = cursor.index(of: cNewline) else { break }
-        #endif
+        guard var idx = cursor.firstIndex(of: cNewline) else { break }
         
         let nextCursor = cursor[idx.advanced(by: 1)..<cursor.endIndex]
         if idx > cursor.startIndex && cursor[idx - 1] == cCarriageReturn {
@@ -99,20 +91,12 @@ public struct IRCMessageParser {
       
       if !cursor.isEmpty {
         overflowBuffer = allocator.buffer(capacity: cursor.count)
-        #if swift(>=5)
-          overflowBuffer!.writeBytes(cursor)
-        #else
-          overflowBuffer!.write(bytes: cursor)
-        #endif
+        overflowBuffer!.writeBytes(cursor)
       }
     }
   }
   
-  #if swift(>=4.1)
-    typealias Slice = Swift.Slice<UnsafeRawBufferPointer>
-  #else
-    typealias Slice = RandomAccessSlice<UnsafeRawBufferPointer>
-  #endif
+  typealias Slice = Swift.Slice<UnsafeRawBufferPointer>
   
   @inline(__always)
   private func processLine(_ line: Slice) throws -> IRCMessage {
@@ -126,7 +110,7 @@ public struct IRCMessageParser {
     
     var cursor = line
     
-    func isDigit(_ c: UInt8) -> Bool { return c >= 48 && c < 58 }
+    func isDigit(_ c: UInt8) -> Bool { return c >= c0 && c <= c9 }
     func isLetter(_ c: UInt8) -> Bool {
       return (c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A)
     }
@@ -155,12 +139,7 @@ public struct IRCMessageParser {
     
     if cursor[cursor.startIndex] == cColon {
       let startIndex = cursor.startIndex.advanced(by: 1)
-
-      #if swift(>=5)
-        let spaceIdx = line.firstIndex(of: cSpace)
-      #else
-        let spaceIdx = line.index(of: cSpace)
-      #endif
+      let spaceIdx   = line.firstIndex(of: cSpace)
 
       guard let endSourceIdx = spaceIdx, endSourceIdx > startIndex else {
         throw Error.invalidPrefix(Data(line))
@@ -203,12 +182,8 @@ public struct IRCMessageParser {
       cursor = cursor[idx2.advanced(by: 1)..<cursor.endIndex]
     }
     else {
-      #if swift(>=5)
-        let endIdx = cursor.firstIndex(where: { !isLetter($0) })
-                  ?? cursor.endIndex
-      #else
-        let endIdx = cursor.index(where: { !isLetter($0) }) ?? cursor.endIndex
-      #endif
+      let endIdx = cursor.firstIndex(where: { !isLetter($0) })
+                ?? cursor.endIndex
       
       let cmdSlice = cursor[cursor.startIndex..<endIdx]
       guard let s = makeString(from: cmdSlice) else {
@@ -238,13 +213,9 @@ public struct IRCMessageParser {
         nextCursor = cursor[cursor.endIndex..<cursor.endIndex]
       }
       else if isNoSpaceControlLineFeedColon(cursor[cursor.startIndex]) {
-        #if swift(>=5)
-          let idxO = cursor.firstIndex(where: {
-            !isNoSpaceControlLineFeedColon($0)
-          })
-        #else
-          let idxO = cursor.index(where: { !isNoSpaceControlLineFeedColon($0) })
-        #endif
+        let idxO = cursor.firstIndex(where: {
+          !isNoSpaceControlLineFeedColon($0)
+        })
         let idx = idxO ?? cursor.endIndex
         argSlice   = cursor[cursor.startIndex..<idx]
         nextCursor = cursor[idx..<cursor.endIndex]
@@ -287,4 +258,3 @@ public struct IRCMessageParser {
     }
   }
 }
-

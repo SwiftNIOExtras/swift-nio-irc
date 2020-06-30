@@ -193,8 +193,13 @@ extension IRCCommand : CustomStringConvertible {
   
   public var description : String {
     switch self {
-      case .PING(let v), .PONG(let v):
-        return "\(commandAsString) '\(v)'"
+      case .PING(let server, let server2), .PONG(let server, let server2):
+        if let server2 = server2 {
+          return "\(commandAsString) '\(server)' '\(server2)'"
+        }
+        else {
+          return "\(commandAsString) '\(server)'"
+        }
       
       case .QUIT(.some(let v)): return "QUIT '\(v)'"
       case .QUIT(.none): return "QUIT"
