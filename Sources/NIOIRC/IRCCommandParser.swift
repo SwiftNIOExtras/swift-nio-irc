@@ -21,7 +21,6 @@ public extension IRCCommand {
    * The parser validates the argument counts etc and throws exceptions on
    * unexpected input.
    */
-  @inlinable
   init(_ command: String, arguments: [ String ]) throws {
     typealias Error = IRCParserError
     
