@@ -50,7 +50,7 @@ public struct IRCMessageParser {
   public typealias Yield = ( ( Error?, IRCMessage? ) ) -> Void
   
   @usableFromInline let allocator      = ByteBufferAllocator()
-  @usableFromInline private(set) var overflowBuffer : ByteBuffer? = nil
+  @usableFromInline var overflowBuffer : ByteBuffer? = nil
   
   @inlinable
   public mutating func feed(_ buffer: ByteBuffer, yield: Yield) {
