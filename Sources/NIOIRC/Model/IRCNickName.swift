@@ -27,8 +27,34 @@ public struct IRCNickName : Hashable, CustomStringConvertible {
   @usableFromInline let storage    : String
   @usableFromInline let normalized : String
   
-  public init?(_ s: String) {
-    guard IRCNickName.validate(string: s) else { return nil }
+  public struct ValidationFlags: OptionSet {
+    public let rawValue : UInt8
+    public init(rawValue: UInt8) { self.rawValue = rawValue }
+    
+    /**
+     * A violation of the IRC spec, but Twitch IRC chatrooms seem to allow
+     * usernames that start w/ a digit.
+     * As per issue #6, thanks @gbeaman.
+     */
+    public static let allowStartingDigit = ValidationFlags(rawValue: 1 << 0)
+    
+    /**
+     * Per RFC a nickname has to be between 2...9 characters, but that is
+     * rarely the case in practice.
+     * By default we allow up to 1024 characters.
+     */
+    public static let strictLengthLimit  = ValidationFlags(rawValue: 1 << 1)
+  }
+  
+  @inlinable
+  public init?(_ s: String,
+               validationFlags: ValidationFlags = [ .allowStartingDigit ])
+  {
+    guard IRCNickName.validate(string: s,
+                               validationFlags: validationFlags) else
+    {
+      return nil
+    }
     storage    = s
     normalized = s.ircLowercased()
   }
@@ -51,12 +77,17 @@ public struct IRCNickName : Hashable, CustomStringConvertible {
   @inlinable
   public var description : String { return stringValue }
 
-  public static func validate(string: String, strict : Bool = false) -> Bool {
+  public static func validate(string: String, validationFlags: ValidationFlags)
+                     -> Bool
+  {
+    let strict = validationFlags.contains(.strictLengthLimit)
     guard string.count > 1 && string.count <= (strict ? 9 : 1024) else {
       return false
     }
     
-    let firstCS = CharacterSets.letterOrSpecial
+    let firstCS = validationFlags.contains(.allowStartingDigit)
+      ? CharacterSets.letterDigitOrSpecial
+      : CharacterSets.letterOrSpecial
     let innerCS = CharacterSets.letterDigitSpecialOrDash
     
     let scalars = string.unicodeScalars
@@ -72,10 +103,11 @@ public struct IRCNickName : Hashable, CustomStringConvertible {
 import struct Foundation.CharacterSet
 
 fileprivate enum CharacterSets {
-  static let letter          = CharacterSet.letters
-  static let digit           = CharacterSet.decimalDigits
-  static let special         = CharacterSet(charactersIn: "[]\\`_^{|}")
-  static let letterOrSpecial = letter.union(special)
-  static let letterDigitSpecialOrDash = letter.union(digit).union(special)
-                                      .union(CharacterSet(charactersIn: "-"))
+  static let letter                   = CharacterSet.letters
+  static let digit                    = CharacterSet.decimalDigits
+  static let special                  = CharacterSet(charactersIn: "[]\\`_^{|}")
+  static let letterOrSpecial          = letter.union(special)
+  static let letterDigitOrSpecial     = letter.union(digit).union(special)
+  static let letterDigitSpecialOrDash = letterDigitOrSpecial
+                                        .union(CharacterSet(charactersIn: "-"))
 }

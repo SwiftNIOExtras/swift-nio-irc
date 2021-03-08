@@ -26,7 +26,9 @@ public struct IRCServerName : Hashable {
   
   @inlinable
   public init?(_ s: String) {
-    guard IRCNickName.validate(string: s) else { return nil }
+    guard IRCNickName.validate(string: s, validationFlags: []) else {
+      return nil
+    }
     storage    = s
     normalized = s.ircLowercased()
   }
