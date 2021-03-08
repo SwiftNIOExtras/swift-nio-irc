@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018-2020 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2021 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -49,9 +49,10 @@ public struct IRCMessageParser {
   
   public typealias Yield = ( ( Error?, IRCMessage? ) ) -> Void
   
-  private let allocator      = ByteBufferAllocator()
-  private var overflowBuffer : ByteBuffer? = nil
+  @usableFromInline let allocator      = ByteBufferAllocator()
+  @usableFromInline private(set) var overflowBuffer : ByteBuffer? = nil
   
+  @inlinable
   public mutating func feed(_ buffer: ByteBuffer, yield: Yield) {
     if var ob = overflowBuffer {
       overflowBuffer = nil
@@ -95,11 +96,11 @@ public struct IRCMessageParser {
       }
     }
   }
-  
-  typealias Slice = Swift.Slice<UnsafeRawBufferPointer>
-  
-  @inline(__always)
-  private func processLine(_ line: Slice) throws -> IRCMessage {
+    
+  @usableFromInline
+  func processLine(_ line: Swift.Slice<UnsafeRawBufferPointer>) throws
+       -> IRCMessage
+  {
     // Basic syntax:
     //   [':' SOURCE]? ' ' COMMAND [' ' ARGS]? [' :' LAST-ARG]?
     let cSpace : UInt8 = 32
@@ -128,14 +129,15 @@ public struct IRCMessageParser {
       }
     }
 
-    func makeString(from slice: Slice?) -> String? {
+    func makeString(from slice: Swift.Slice<UnsafeRawBufferPointer>?) -> String?
+    {
       guard let slice = slice else { return nil }
       return String(data: Data(slice), encoding: .utf8) // Sigh, the pain.
     }
 
     /* parse source */
     
-    let source : Slice?
+    let source : Swift.Slice<UnsafeRawBufferPointer>?
     
     if cursor[cursor.startIndex] == cColon {
       let startIndex = cursor.startIndex.advanced(by: 1)
@@ -206,8 +208,8 @@ public struct IRCMessageParser {
         throw Error.tooManyArguments(Data(line))
       }
 
-      var nextCursor : Slice
-      let argSlice   : Slice
+      var nextCursor : Swift.Slice<UnsafeRawBufferPointer>
+      let argSlice   : Swift.Slice<UnsafeRawBufferPointer>
       if cursor[cursor.startIndex] == cColon {
         argSlice   = cursor[cursor.startIndex.advanced(by: 1)..<cursor.endIndex]
         nextCursor = cursor[cursor.endIndex..<cursor.endIndex]

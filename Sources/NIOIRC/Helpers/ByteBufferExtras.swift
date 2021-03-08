@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2021 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -34,6 +34,7 @@ fileprivate extension BinaryInteger {
 
 extension ByteBuffer {
   
+  @inlinable
   @discardableResult
   public mutating func write<T: SignedInteger>(integerAsString integer: T,
                                                as: T.Type = T.self) -> Int

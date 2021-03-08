@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018-2020 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2021 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -44,11 +44,14 @@ open class IRCChannelHandler : ChannelDuplexHandler {
   public typealias OutboundIn  = IRCMessage
   public typealias OutboundOut = ByteBuffer
 
+  @inlinable
   public init() {}
   
+  @inlinable
   open func channelActive(context: ChannelHandlerContext) {
     context.fireChannelActive()
   }
+  @inlinable
   open func channelInactive(context: ChannelHandlerContext) {
     context.fireChannelInactive()
   }
@@ -56,8 +59,10 @@ open class IRCChannelHandler : ChannelDuplexHandler {
   
   // MARK: - Reading
   
+  @usableFromInline
   var parser = IRCMessageParser()
   
+  @inlinable
   open func channelRead(context: ChannelHandlerContext, data: NIOAny) {
     let buffer = self.unwrapInboundIn(data)
     
@@ -71,10 +76,12 @@ open class IRCChannelHandler : ChannelDuplexHandler {
     }
   }
   
+  @inlinable
   open func channelRead(context: ChannelHandlerContext, value: InboundOut) {
     context.fireChannelRead(self.wrapInboundOut(value))
   }
   
+  @inlinable
   open func errorCaught(context: ChannelHandlerContext, error: Swift.Error) {
     context.fireErrorCaught(InboundErr.transportError(error))
   }
@@ -82,6 +89,7 @@ open class IRCChannelHandler : ChannelDuplexHandler {
   
   // MARK: - Writing
   
+  @inlinable
   public func write(context: ChannelHandlerContext, data: NIOAny,
                     promise: EventLoopPromise<Void>?)
   {
@@ -89,6 +97,7 @@ open class IRCChannelHandler : ChannelDuplexHandler {
     write(context: context, value: message, promise: promise)
   }
   
+  @inlinable
   public final func write(context: ChannelHandlerContext, value: IRCMessage,
                           promise: EventLoopPromise<Void>?)
   {
@@ -98,6 +107,7 @@ open class IRCChannelHandler : ChannelDuplexHandler {
     context.write(NIOAny(buffer), promise: promise)
   }
   
+  @inlinable
   func encode(value: IRCMessage, target: String?,
               into buffer: inout ByteBuffer)
   {
@@ -251,6 +261,7 @@ open class IRCChannelHandler : ChannelDuplexHandler {
 
 extension ByteBuffer {
   
+  @usableFromInline
   mutating func writeCSVArgument<T: Sequence>(_ args: T)
                            where T.Element == String
   {
@@ -266,6 +277,8 @@ extension ByteBuffer {
       writeString(arg)
     }
   }
+  
+  @usableFromInline
   mutating func writeArguments<T: Sequence>(_ args: T)
                          where T.Element == String
   {
@@ -276,6 +289,8 @@ extension ByteBuffer {
       writeString(arg)
     }
   }
+  
+  @usableFromInline
   mutating func writeArguments<T: Collection>(_ args: T, useLast: Bool = false)
                          where T.Element == String
   {
@@ -292,6 +307,7 @@ extension ByteBuffer {
     return writeLastArgument(args[lastIdx])
   }
 
+  @usableFromInline
   mutating func writeLastArgument(_ s: String) {
     let cSpace : UInt8 = 32
     let cColon : UInt8 = 58
@@ -300,5 +316,4 @@ extension ByteBuffer {
     writeInteger(cColon)
     writeString(s)
   }
-  
 }

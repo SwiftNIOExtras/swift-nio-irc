@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2021 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -87,6 +87,7 @@ public enum IRCDispatcherError : Swift.Error {
 
 public extension IRCDispatcher {
 
+  @inlinable
   func irc_msgSend(_ message: IRCMessage) throws {
     try irc_defaultMsgSend(message)
   }

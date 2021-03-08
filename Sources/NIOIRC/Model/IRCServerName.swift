@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2021 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -21,33 +21,28 @@ public struct IRCServerName : Hashable {
   
   public typealias StringLiteralType = String
   
-  let storage    : String
-  let normalized : String
+  @usableFromInline let storage    : String
+  @usableFromInline let normalized : String
   
+  @inlinable
   public init?(_ s: String) {
     guard IRCNickName.validate(string: s) else { return nil }
     storage    = s
     normalized = s.ircLowercased()
   }
   
-  public var stringValue : String {
-    return storage
-  }
+  @inlinable
+  public var stringValue : String { return storage }
   
-  #if compiler(>=5)
-    public func hash(into hasher: inout Hasher) {
-      normalized.hash(into: &hasher)
-    }
-  #else
-    public var hashValue: Int {
-      return normalized.hashValue
-    }
-  #endif
+  @inlinable
+  public func hash(into hasher: inout Hasher) { normalized.hash(into: &hasher) }
   
+  @inlinable
   public static func ==(lhs: IRCServerName, rhs: IRCServerName) -> Bool {
     return lhs.normalized == rhs.normalized
   }
   
+  @inlinable
   public static func validate(string: String) -> Bool {
     guard string.count > 1 && string.count <= 63 else {
       return false
@@ -56,7 +51,5 @@ public struct IRCServerName : Hashable {
     // TODO: RFC 2812 2.3.1
     
     return true
-  }
-  
+  }  
 }
-

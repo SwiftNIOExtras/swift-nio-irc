@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2021 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -29,35 +29,33 @@ public struct IRCChannelName : Hashable, CustomStringConvertible {
   
   public typealias StringLiteralType = String
   
-  let storage    : String
-  let normalized : String
-  
+  @usableFromInline let storage    : String
+  @usableFromInline let normalized : String
+
+  @inlinable
   public init?(_ s: String) {
     guard IRCChannelName.validate(string: s) else { return nil }
     storage    = s
     normalized = s.ircLowercased()
   }
   
-  public var stringValue : String {
-    return storage
+  @inlinable
+  public var stringValue : String { return storage }
+  
+  @inlinable
+  public func hash(into hasher: inout Hasher) {
+    normalized.hash(into: &hasher)
   }
   
-  #if compiler(>=5)
-    public func hash(into hasher: inout Hasher) {
-      normalized.hash(into: &hasher)
-    }
-  #else
-    public var hashValue: Int {
-      return normalized.hashValue
-    }
-  #endif
-  
+  @inlinable
   public static func ==(lhs: IRCChannelName, rhs: IRCChannelName) -> Bool {
     return lhs.normalized == rhs.normalized
   }
   
+  @inlinable
   public var description : String { return stringValue }
   
+  @inlinable
   public static func validate(string: String) -> Bool {
     guard string.count > 1 && string.count <= 50 else { return false }
     

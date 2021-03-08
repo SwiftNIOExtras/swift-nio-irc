@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2021 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -21,25 +21,17 @@ public enum IRCMessageRecipient : Hashable {
   // TODO:
   // or: user, or user%host, @server, etc
   // or: nickname!user@host
-  
-  #if compiler(>=5)
-    public func hash(into hasher: inout Hasher) {
-      switch self {
-        case .channel (let name): return name.hash(into: &hasher)
-        case .nickname(let name): return name.hash(into: &hasher)
-        case .everything:         return 42.hash(into: &hasher) // TBD?
-      }
+
+  @inlinable
+  public func hash(into hasher: inout Hasher) {
+    switch self {
+      case .channel (let name): return name.hash(into: &hasher)
+      case .nickname(let name): return name.hash(into: &hasher)
+      case .everything:         return 42.hash(into: &hasher) // TBD?
     }
-  #else
-    public var hashValue: Int {
-      switch self {
-        case .channel (let name): return name.hashValue
-        case .nickname(let name): return name.hashValue
-        case .everything:         return 42
-      }
-    }
-  #endif
+  }
   
+  @inlinable
   public static func ==(lhs: IRCMessageRecipient, rhs: IRCMessageRecipient)
                   -> Bool
   {
@@ -54,37 +46,32 @@ public enum IRCMessageRecipient : Hashable {
 
 public extension IRCMessageRecipient {
   
+  @inlinable
   init?(_ s: String) {
-    if s == "*" {
-      self = .everything
-    }
-    else if let channel = IRCChannelName(s) {
-      self = .channel(channel)
-    }
-    else if let nick = IRCNickName(s) {
-      self = .nickname(nick)
-    }
-    else {
-      return nil
-    }
+    if s == "*"                             { self = .everything       }
+    else if let channel = IRCChannelName(s) { self = .channel(channel) }
+    else if let nick    = IRCNickName   (s) { self = .nickname(nick)   }
+    else                                    { return nil               }
   }
   
+  @inlinable
   var stringValue : String {
     switch self {
-      case .channel (let name): return name.stringValue
-      case .nickname(let name): return name.stringValue
-      case .everything: return "*"
+      case .channel (let name) : return name.stringValue
+      case .nickname(let name) : return name.stringValue
+      case .everything         : return "*"
     }
   }
 }
 
 extension IRCMessageRecipient : CustomStringConvertible {
   
+  @inlinable
   public var description : String {
     switch self {
-      case .channel (let name): return name.description
-      case .nickname(let name): return name.description
-      case .everything: return "<IRCRecipient: *>"
+      case .channel (let name) : return name.description
+      case .nickname(let name) : return name.description
+      case .everything         : return "<IRCRecipient: *>"
     }
   }
 }

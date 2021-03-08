@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2021 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -26,6 +26,7 @@ public struct IRCMessage : Codable, CustomStringConvertible {
     case origin, target, command, arguments
   }
 
+  @inlinable
   public init(origin: String? = nil, target: String? = nil,
               command: IRCCommand)
   {
@@ -42,11 +43,13 @@ public struct IRCMessage : Codable, CustomStringConvertible {
    *
    * This is a server name or a nickname w/ user@host parts.
    */
+  @inlinable
   public var origin : String? {
     set { copyStorageIfNeeded(); _storage.origin = newValue }
     get { return _storage.origin }
   }
   
+  @inlinable
   public var target : String? {
     set { copyStorageIfNeeded(); _storage.target = newValue }
     get { return _storage.target }
@@ -55,11 +58,13 @@ public struct IRCMessage : Codable, CustomStringConvertible {
   /**
    * The IRC command and its arguments (max 15).
    */
+  @inlinable
   public var command : IRCCommand {
     set { copyStorageIfNeeded(); _storage.command = newValue }
     get { return _storage.command }
   }
   
+  @inlinable
   public var description: String {
     var ms = "<IRCMsg:"
     if let origin = origin { ms += " from=\(origin)" }
@@ -73,34 +78,38 @@ public struct IRCMessage : Codable, CustomStringConvertible {
   
   // MARK: - Internal Storage to keep the value small
   
-  @inline(__always)
-  private mutating func copyStorageIfNeeded() {
+  @usableFromInline
+  mutating func copyStorageIfNeeded() {
     if !isKnownUniquelyReferenced(&_storage) {
       _storage = _Storage(_storage)
     }
   }
 
-  private class _Storage {
-    var origin  : String?
-    var target  : String?
-    var command : IRCCommand
+  @usableFromInline
+  class _Storage {
+    @usableFromInline var origin  : String?
+    @usableFromInline var target  : String?
+    @usableFromInline var command : IRCCommand
 
+    @usableFromInline
     init(origin: String?, target: String?, command: IRCCommand) {
       self.origin  = origin
       self.target  = target
       self.command = command
     }
+    @usableFromInline
     init(_ other: _Storage) {
       self.origin  = other.origin
       self.target  = other.target
       self.command = other.command
     }
   }
-  private var _storage : _Storage
+  @usableFromInline var _storage : _Storage
   
   
   // MARK: - Codable
 
+  @inlinable
   public init(from decoder: Decoder) throws {
     let c       = try decoder.container(keyedBy: CodingKeys.self)
     let cmd     = try c.decode(String.self,              forKey: .command)
@@ -111,6 +120,7 @@ public struct IRCMessage : Codable, CustomStringConvertible {
               target: try c.decodeIfPresent(String.self, forKey: .target),
               command: command)
   }
+  @inlinable
   public func encode(to encoder: Encoder) throws {
     var c = encoder.container(keyedBy: CodingKeys.self)
     try c.encodeIfPresent(origin,         forKey: .origin)
