@@ -34,7 +34,6 @@ fileprivate extension BinaryInteger {
 
 extension ByteBuffer {
   
-  @inlinable
   @discardableResult
   public mutating func write<T: SignedInteger>(integerAsString integer: T,
                                                as: T.Type = T.self) -> Int

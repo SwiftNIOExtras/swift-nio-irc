@@ -101,7 +101,7 @@ extension IRCCommand : CustomStringConvertible {
     }
   }
   
-  /* break 5.2? @inlinable */
+  @inlinable
   public var arguments : [ String ] {
     switch self {
       case .NICK(let nick): return [ nick.stringValue ]
