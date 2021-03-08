@@ -1,6 +1,5 @@
 # SwiftNIO IRC
 
-![Swift4](https://img.shields.io/badge/swift-4-blue.svg)
 ![Swift5](https://img.shields.io/badge/swift-5-blue.svg)
 ![iOS](https://img.shields.io/badge/os-iOS-green.svg?style=flat)
 ![macOS](https://img.shields.io/badge/os-macOS-green.svg?style=flat)

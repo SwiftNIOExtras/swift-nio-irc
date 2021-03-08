@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2021 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -34,16 +34,17 @@ public protocol IRCMessageTarget {
 
 public extension IRCMessageTarget {
 
+  @inlinable
   func sendMessage(_ message: IRCMessage,
                    promise: EventLoopPromise<Void>? = nil)
   {
     sendMessages([ message ], promise: promise)
   }
-
 }
 
 public extension IRCMessageTarget {
   
+  @inlinable
   func sendMessage(_ text: String, to recipients: IRCMessageRecipient...) {
     guard !recipients.isEmpty else { return }
     
@@ -56,6 +57,7 @@ public extension IRCMessageTarget {
     sendMessages(messages, promise: nil)
   }
   
+  @inlinable
   func sendNotice(_ text: String, to recipients: IRCMessageRecipient...) {
     guard !recipients.isEmpty else { return }
     
@@ -68,6 +70,7 @@ public extension IRCMessageTarget {
     sendMessages(messages, promise: nil)
   }
   
+  @inlinable
   func sendRawReply(_ code: IRCCommandCode, _ args: String...) {
     sendMessage(IRCMessage(origin: origin, command: .numeric(code, args)))
   }

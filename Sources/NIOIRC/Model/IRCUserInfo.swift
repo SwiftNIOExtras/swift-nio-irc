@@ -2,7 +2,7 @@
 //
 // This source file is part of the swift-nio-irc open source project
 //
-// Copyright (c) 2018 ZeeZide GmbH. and the swift-nio-irc project authors
+// Copyright (c) 2018-2021 ZeeZide GmbH. and the swift-nio-irc project authors
 // Licensed under Apache License v2.0
 //
 // See LICENSE.txt for license information
@@ -20,6 +20,7 @@ public struct IRCUserInfo : Equatable {
   public let servername : String?
   public let realname   : String
   
+  @inlinable
   public init(username: String, usermask: IRCUserMode, realname: String) {
     self.username   = username
     self.usermask   = usermask
@@ -27,6 +28,7 @@ public struct IRCUserInfo : Equatable {
     self.hostname   = nil
     self.servername = nil
   }
+  @inlinable
   public init(username: String, hostname: String, servername: String,
               realname: String)
   {
@@ -37,6 +39,7 @@ public struct IRCUserInfo : Equatable {
     self.usermask   = nil
   }
 
+  @inlinable
   public static func ==(lhs: IRCUserInfo, rhs: IRCUserInfo) -> Bool {
     if lhs.username   != rhs.username   { return false }
     if lhs.realname   != rhs.realname   { return false }
@@ -49,6 +52,7 @@ public struct IRCUserInfo : Equatable {
 
 extension IRCUserInfo : CustomStringConvertible {
   
+  @inlinable
   public var description : String {
     var ms = "<IRCUserInfo: \(username)"
     if let v = usermask   { ms += " mask=\(v)" }
@@ -58,5 +62,5 @@ extension IRCUserInfo : CustomStringConvertible {
     ms += ">"
     return ms
   }
-  
+
 }
